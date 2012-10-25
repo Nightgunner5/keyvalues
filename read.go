@@ -31,11 +31,23 @@ func (p *parser) Lex(y *yySymType) int {
 	switch r {
 	case ' ', '\t', '\r':
 		return p.Lex(y)
+
 	case '\n':
 		p.line++
 		return p.Lex(y)
+
 	case '{', '}', '"':
 		return int(r)
+
+	case '/':
+		if r, _, _ := p.r.ReadRune(); r == '/' {
+			p.r.ReadString('\n')
+			p.line++
+			return p.Lex(y)
+		}
+		p.r.UnreadRune()
+
+		fallthrough
 	default:
 		runes := []rune{r}
 readloop:
